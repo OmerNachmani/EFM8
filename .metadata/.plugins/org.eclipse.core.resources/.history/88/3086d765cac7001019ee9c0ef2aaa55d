@@ -1,0 +1,89 @@
+$INCLUDE (SI_EFM8UB2_Defs.inc)
+
+;-------------------------------------My defines---------------------------------------
+LED0 EQU P1.6   ; LED is connected to Port 1, Bit 6
+PB0 EQU P0.2    ; Push Button 0 (Start) connected to P0.2
+PB1 EQU P0.3    ; Push Button 1 (Stop) connected to P0.3
+
+; Calculation (approx 62,500 cycles @ 1.5 MHz):
+R0_VAL EQU 100  ; Outer loop constant
+R1_VAL EQU 10   ; Middle loop constant
+R2_VAL EQU 63   ; Inner loop constant (100 * 10 * 63 = 63,000 iterations approx.)
+
+
+;--------------------------------------------------------------------------------------
+; RESET and INTERRUPT VECTORS
+;--------------------------------------------------------------------------------------
+CSEG AT 0
+    LJMP MAIN   ; Reset Vector
+    ORG 0B3H    ; Start of main program code
+
+;--------------------------------------------------------------------------------------
+; Initialization
+;--------------------------------------------------------------------------------------
+Init_Device:
+    ANL PCA0MD, #~(040h)
+    MOV XBR1, #40h         ; Enable Crossbar
+
+
+    ORL P0MDIN, #04h ; P0.2 as Digital Input
+    ANL P0MDOUT, #~(04h) ;P0.2 as Open-Drain
+    SETB PB0
+
+
+    ORL P0MDIN, #08h ;P0.3 as Digital Input
+    ANL P0MDOUT, #~(08h) ;P0.3 as Open-Drain
+    SETB PB1
+
+
+    ORL P1MDIN, #40h ;P1.6 as Digital Input
+    ORL P1MDOUT, #40h ;P1.6 as Push-Pull Output
+    SETB LED0
+
+    RET
+
+
+; -------------------------------------------
+; DELAY Subroutine (~0.125s delay)
+; -------------------------------------------
+DELAY:
+    MOV R0, #R0_VAL
+R0_LOOP:
+    MOV R1, #R1_VAL
+R1_LOOP:
+    MOV R2, #R2_VAL
+R2_LOOP:
+    DJNZ R2, R2_LOOP  ; Inner loop (63 cycles)
+    DJNZ R1, R1_LOOP  ; Middle loop (10 times)
+    DJNZ R0, R0_LOOP  ; Outer loop (100 times)
+    cpl LED0 ; Toggle LED state
+    RET
+
+;--------------------------------------------------------------------------------------
+; CODE SEGMENT
+;--------------------------------------------------------------------------------------
+
+MAIN:
+    LCALL INIT_DEVICE ; Configure I/O
+
+; *** Polling Logic ***
+
+NO_BLINK:           ; State 1: Wait for PB0 press
+
+    JB PB0, NO_BLINK
+
+
+LOOP:               ; State 2: Blinking loop
+    ; --- Blink ON/OFF ---
+    CPL LED0            ; Toggle LED state
+    LCALL DELAY
+
+    ; --- Check for STOP (PB1) ---
+    JB PB1, LOOP
+
+    ; If execution reaches here, PB1 is pressed (0). Stop blinking.
+
+    SJMP NO_BLINK      ; PB1 released, return to wait for start
+
+END
+

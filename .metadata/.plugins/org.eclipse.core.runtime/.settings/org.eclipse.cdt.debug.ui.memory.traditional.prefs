@@ -1,0 +1,7 @@
+eclipse.preferences.version=1
+memoryColorBackgroundMemorySpace-CODE=238,192,192
+memoryColorBackgroundMemorySpace-RAM=250,238,195
+memoryColorBackgroundMemorySpace-SFR=255,179,0
+memoryColorBackgroundMemorySpace-USB=184,242,255
+memoryColorBackgroundMemorySpace-XRAM=122,245,0
+memorySpaceIdList=CODE,RAM,SFR,XRAM,USB

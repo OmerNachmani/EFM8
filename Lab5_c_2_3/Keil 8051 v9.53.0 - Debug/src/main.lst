@@ -1,0 +1,187 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              01/02/2026 11:31:44 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\src/main.OBJ
+COMPILER INVOKED BY: Z:\home\onachman\SimplicityStudio5\SimplicityStudio_v5\developer\toolchains\keil_8051\9.60\BIN\C51 
+                    -/home/onachman/SimplicityStudio/v5_workspace/Lab5_c_2_3/src/main.c OMF2 SMALL DEBUG OBJECTEXTEND ROM(LARGE) WARNINGLEVEL
+                    -(2) FLOATFUZZY(3) OPTIMIZE(8,SPEED) INTVECTOR(0X0000) INTPROMOTE INCDIR(/home/onachman/SimplicityStudio/v5_workspace/Lab
+                    -5_c_2_3/inc;/home/onachman/SimplicityStudio/v5_workspace/Lab5_c_2_3/inc/config;/home/onachman/SimplicityStudio5/Simplici
+                    -tyStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc;/home/onachman/SimplicityStudio5/Simplic
+                    -ityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc/graphics;/home/onachman/SimplicityStudi
+                    -o5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc/config;/home/onachman/Simplic
+                    -ityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/bsp;/home/onachman/SimplicityStudio5/SimplicitySt
+                    -udio_v5/developer/sdks/8051/v4.3.1//kits/EFM8UB2_SLSTK2001A/config;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/
+                    -developer/sdks/8051/v4.3.1//Device/shared/si8051Base;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks
+                    -/8051/v4.3.1//Device/EFM8UB2/inc;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/c
+                    -ommon/drivers/efm8_joystick;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common
+                    -/drivers/efm8_rgb_led;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//Device/EFM8UB2/pe
+                    -ripheral_driver/inc) PRINT(.\src/main.lst) COND PAGEWIDTH(120) PAGELENGTH(65) OBJECT(.\src/main.OBJ)
+
+line level    source
+
+   1          //-----------------------------------------------------------------------------
+   2          // LAB5 - FINAL
+   3          //-----------------------------------------------------------------------------
+   4          #include "bsp.h"
+   5          #include "InitDevice.h"
+   6          #include "disp.h"
+   7          #include "tick.h"
+   8          #include "render.h"
+   9          #include <stdio.h>
+  10          #include <string.h>
+  11          
+  12          #define LCD_height 128
+  13          #define LCD_width  128
+  14          
+  15          // ADC Control Bits
+  16          sbit FlagFlag = ADC0CN0^5; // ADINT (Conversion Done Flag)
+  17          sbit ADBUSY   = ADC0CN0^4; // ADBUSY (Start Conversion)
+  18          
+  19          //-----------------------------------------------------------------------------
+  20          // SiLabs_Startup() Routine
+  21          // ----------------------------------------------------------------------------
+  22          void SiLabs_Startup (void)
+  23          {
+  24   1          // Explicitly disable the Watchdog Timer
+  25   1          PCA0MD &= ~0x40;
+  26   1      }
+  27          
+  28          //-----------------------------------------------------------------------------
+  29          // Init_ADC_Force()
+  30          //-----------------------------------------------------------------------------
+  31          void Init_ADC_Force(void)
+  32          {
+  33   1          // 1. SELECT REFERENCE VOLTAGE (VDD)
+  34   1          REF0CN = 0x08;
+  35   1      
+  36   1          // 2. SET ADC CLOCK
+  37   1          // Your InitDevice used divider 7. We will use a safe divider of 4.
+  38   1          ADC0CF = (0x04 << 3);
+  39   1      
+  40   1          // 3. REMOVED ADC0AC (Does not exist on EFM8UB2)
+  41   1      
+  42   1          // 4. ENABLE ADC POWER & SET MANUAL MODE
+  43   1          // Your InitDevice set ADCM to Timer0 (0x02).
+C51 COMPILER V9.60.0.0   MAIN                                                              01/02/2026 11:31:44 PAGE 2   
+
+  44   1          // We MUST set ADCM to 0x00 for ADBUSY=1 to work.
+  45   1          // 0x80 = Enable (Bit 7) | Manual Mode (Bits 2-0 are 000)
+  46   1          ADC0CN0 = 0x80;
+  47   1      }
+  48          
+  49          int main(void)
+  50          {
+  51   1          // --- VARIABLES ---
+  52   1          SI_SEGMENT_VARIABLE(line[DISP_BUF_SIZE], uint8_t, RENDER_LINE_SEG);
+  53   1          int i = 0;
+  54   1          long timeout_counter = 0;
+  55   1          float digitalValue;
+  56   1          float Vin;
+  57   1          char buffer[20];
+  58   1          char direct[20];
+  59   1          // -----------------
+  60   1      
+  61   1          enter_DefaultMode_from_RESET();
+  62   1      
+  63   1          // --- FORCE FIX ---
+  64   1          Init_ADC_Force();
+  65   1      
+  66   1          // Disable ADC Interrupt (Use Polling)
+  67   1          EIE1 &= ~0x02;
+  68   1      
+  69   1          // Enable Global Interrupts (for display)
+  70   1          IE_EA = 1;
+  71   1      
+  72   1          DISP_Init();
+  73   1          DISP_ClearAll();
+  74   1      
+  75   1          // Initial Debug Message
+  76   1          for (i = 0; i < FONT_HEIGHT; i++)
+  77   1          {
+  78   2              RENDER_StrLine(line, 3, i, "Group 2");
+  79   2              DISP_WriteLine(0 + i, line);
+  80   2          }
+  81   1      
+  82   1          FlagFlag = 0;
+  83   1      
+  84   1          while(1)
+  85   1          {
+  86   2              // 1. Start Conversion
+  87   2              // Now that ADCM is 0 (set by Init_ADC_Force), this will actually work.
+  88   2              ADBUSY = 1;
+  89   2      
+  90   2              // 2. Wait for completion (Polling with timeout)
+  91   2              timeout_counter = 0;
+  92   2              while(FlagFlag == 0)
+  93   2              {
+  94   3                  timeout_counter++;
+  95   3                  // Emergency break if hardware is stuck
+  96   3                  if(timeout_counter > 50000) break;
+  97   3              }
+  98   2      
+  99   2              // 3. Handle Timeout
+ 100   2              if (timeout_counter > 50000)
+ 101   2              {
+ 102   3                   for (i = 0; i < FONT_HEIGHT; i++)
+ 103   3                  {
+ 104   4                      RENDER_StrLine(line, 3, i, "ADC TIMEOUT");
+ 105   4                      DISP_WriteLine(10 + i, line);
+ 106   4                  }
+C51 COMPILER V9.60.0.0   MAIN                                                              01/02/2026 11:31:44 PAGE 3   
+
+ 107   3                  // Attempt restart
+ 108   3                  ADC0CN0 = 0x80;
+ 109   3                  FlagFlag = 0;
+ 110   3                  continue;
+ 111   3              }
+ 112   2      
+ 113   2              // 4. Process Data
+ 114   2              digitalValue = (float)ADC0;
+ 115   2              Vin = (digitalValue / 1023.0) * 3.3;
+ 116   2      
+ 117   2              FlagFlag = 0;
+ 118   2      
+ 119   2              // --- DISPLAY LOGIC ---
+ 120   2      
+ 121   2              // Voltage
+ 122   2              for (i = 0; i < FONT_HEIGHT; i++)
+ 123   2              {
+ 124   3                  sprintf(buffer, "%.3f(V)", Vin);
+ 125   3                  RENDER_StrLine(line, 3, i, buffer);
+ 126   3                  DISP_WriteLine(10 + i, line);
+ 127   3              }
+ 128   2      
+ 129   2              // Direction
+ 130   2              strcpy(direct, "No Press");
+ 131   2              if(Vin < 0.04)                     strcpy(direct, "Center");
+ 132   2              else if (Vin > 1.5 && Vin < 1.9)   strcpy(direct, "Down");
+ 133   2              else if (Vin > 1.9 && Vin < 2.08)  strcpy(direct, "Left");
+ 134   2              else if (Vin > 2.4 && Vin < 2.6)   strcpy(direct, "Right");
+ 135   2              else if (Vin > 2.73 && Vin < 2.93) strcpy(direct, "Up");
+ 136   2      
+ 137   2              for(i = 0; i < FONT_HEIGHT; i++)
+ 138   2              {
+ 139   3                  RENDER_StrLine(line, 3, i, direct);
+ 140   3                  DISP_WriteLine(20 + i, line);
+ 141   3              }
+ 142   2          }
+ 143   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    717    ----
+   CONSTANT SIZE    =     63    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      50
+   IDATA SIZE       =   ----      16
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

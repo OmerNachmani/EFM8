@@ -1,0 +1,47 @@
+12:03:40 **** Incremental Build of configuration Keil 8051 v9.53.0 - Debug for project Lab4_Example_2025_4_2 ****
+make all 
+PATH=/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN:/home/onachman/SimplicityStudio5/SimplicityStudio_v5/support/8051:/usr/bin:/usr/bin:/home/onachman/Siemens/Questa_Student/2024.2/questasim/bin:/home/onachman/bin:/home/onachman/.local/bin:/home/onachman/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/onachman/.lmstudio/bin:/home/onachman/.lmstudio/bin:/home/onachman/.lmstudio/bin:/home/onachman/.lmstudio/bin
+ 
+Building target: Lab4_Example_2025_4_2.omf
+Invoking: Keil 8051 Linker
+wine "/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN/LX51" "@Lab4_Example_2025_4_2.lnp" || test $? -lt 2
+
+LX51 LINKER/LOCATER V4.66.97.0 - SN: K1FVC-D03UZZ
+COPYRIGHT ARM Germany GmbH 1995 - 2019
+@Lab4_Example_2025_4_2.lnp "./lib/bsp/efm8_joystick/joystick.OBJ",
+"./lib/bsp/efm8_memory_lcd/src/disp.OBJ",
+"./lib/bsp/efm8_memory_lcd/src/render.OBJ",
+"./lib/bsp/efm8_rgb_led/rgb_led.OBJ",
+"./lib/efm8ub2/bsp/efm8_memory_lcd/src/spi.OBJ",
+"./lib/efm8ub2/bsp/efm8_memory_lcd/src/tick.OBJ",
+"./lib/efm8ub2/peripheralDrivers/src/spi_0.OBJ",
+"./src/InitDevice.OBJ",
+"./src/SILABS_STARTUP.OBJ",
+"./src/main.OBJ"
+TO "LAB4_EXAMPLE_2025_4_2.OMF.CRBUILD" REMOVEUNUSED PRINT(.\Lab4_Example_2025_4_2.m51) PAGEWIDTH (120) PAGELENGTH (65) CLASSES( ECODE(C:0x0 - C:0xfbfe), HCONST(C:0x0 - C:0xfbfe), XDATA(X:0x0 - X:0xfff), HDATA(X:0x0 - X:0xfff))
+
+*** ERROR L127: UNRESOLVED EXTERNAL SYMBOL
+    SYMBOL:  SILABS_STARTUP
+    MODULE:  ./src/SILABS_STARTUP.OBJ (?C_STARTUP)
+
+*** ERROR L128: REFERENCE MADE TO UNRESOLVED EXTERNAL
+    SYMBOL:  SILABS_STARTUP
+    MODULE:  ./src/SILABS_STARTUP.OBJ (?C_STARTUP)
+    ADDRESS: 100026BH
+
+*** ERROR L127: UNRESOLVED EXTERNAL SYMBOL
+    SYMBOL:  JOYSTICK_getDirection
+    MODULE:  ./src/main.OBJ (MAIN)
+
+*** ERROR L128: REFERENCE MADE TO UNRESOLVED EXTERNAL
+    SYMBOL:  JOYSTICK_getDirection
+    MODULE:  ./src/main.OBJ (MAIN)
+    ADDRESS: 1000183H
+
+Program Size: data=32.5 xdata=20 const=0 code=1223
+LX51 RUN COMPLETE.  0 WARNING(S),  4 ERROR(S)
+make: *** [makefile:50: Lab4_Example_2025_4_2.omf] Error 1
+"make all" terminated with exit code 2. Build might be incomplete.
+
+12:03:42 Build Failed. 5 errors, 0 warnings. (took 1s.540ms)
+

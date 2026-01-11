@@ -1,0 +1,69 @@
+11:27:44 **** Incremental Build of configuration Keil 8051 v9.53.0 - Debug for project Lab5 ****
+make all 
+PATH=/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN:/home/onachman/SimplicityStudio5/SimplicityStudio_v5/support/8051:/usr/bin:/usr/bin:/home/onachman/Siemens/Questa_Student/2024.2/questasim/bin:/home/onachman/bin:/home/onachman/.local/bin:/home/onachman/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/onachman/.lmstudio/bin:/home/onachman/.lmstudio/bin:/home/onachman/.lmstudio/bin:/home/onachman/.lmstudio/bin
+ 
+Building file: ../src/InitDevice.c
+Invoking: Keil 8051 Compiler
+wine "/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN/C51" "@src/InitDevice.__i" || test $? -lt 2
+
+C51 COMPILER V9.60.0.0 - SN: K1FVC-D03UZZ
+COPYRIGHT Copyright (C) 2012 - 2019 ARM Ltd and ARM Germany GmbH. All rights reserved.
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+Finished building: ../src/InitDevice.c
+ 
+Building file: /home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1/Device/shared/si8051Base/SILABS_STARTUP.A51
+Invoking: Keil 8051 Assembler
+wine "/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN/AX51" "@src/SILABS_STARTUP.__ia" || test $? -lt 2
+
+MACRO ASSEMBLER AX51 V3.15.3.0
+COPYRIGHT ARM Germany GmbH 2016
+"Z:\home\onachman\SimplicityStudio5\SimplicityStudio_v5\developer\toolchains\keil_8051\9.60\BIN\AX51" "/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1/Device/shared/si8051Base/SILABS_STARTUP.A51" ERRORPRINT SET (SMALL,SILABS_STARTUP=1) DEBUG MACRO NOMOD51 INCDIR(/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc/graphics;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc/config;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/bsp;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/EFM8UB2_SLSTK2001A/config;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//Device/shared/si8051Base;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//Device/EFM8UB2/inc;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_joystick;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_rgb_led;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//Device/EFM8UB2/peripheral_driver/inc) PRINT(.\src/SILABS_STARTUP.lst) COND SYMBOLS PAGEWIDTH (120) PAGELENGTH (65) OBJECT(.\src/SILABS_STARTUP.OBJ)
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S).
+Finished building: /home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1/Device/shared/si8051Base/SILABS_STARTUP.A51
+ 
+Building file: ../src/main.c
+Invoking: Keil 8051 Compiler
+wine "/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN/C51" "@src/main.__i" || test $? -lt 2
+
+C51 COMPILER V9.60.0.0 - SN: K1FVC-D03UZZ
+COPYRIGHT Copyright (C) 2012 - 2019 ARM Ltd and ARM Germany GmbH. All rights reserved.
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+Finished building: ../src/main.c
+ 
+Building target: Lab5.omf
+Invoking: Keil 8051 Linker
+wine "/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN/LX51" "@Lab5.lnp" || test $? -lt 2
+
+LX51 LINKER/LOCATER V4.66.97.0 - SN: K1FVC-D03UZZ
+COPYRIGHT ARM Germany GmbH 1995 - 2019
+@Lab5.lnp "./lib/bsp/efm8_joystick/joystick.OBJ",
+"./lib/bsp/efm8_memory_lcd/src/disp.OBJ",
+"./lib/bsp/efm8_memory_lcd/src/render.OBJ",
+"./lib/bsp/efm8_rgb_led/rgb_led.OBJ",
+"./lib/efm8ub2/bsp/efm8_memory_lcd/src/spi.OBJ",
+"./lib/efm8ub2/bsp/efm8_memory_lcd/src/tick.OBJ",
+"./lib/efm8ub2/peripheralDrivers/src/spi_0.OBJ",
+"./src/InitDevice.OBJ",
+"./src/SILABS_STARTUP.OBJ",
+"./src/main.OBJ"
+TO "LAB5.OMF.CRBUILD" REMOVEUNUSED PRINT(.\Lab5.m51) PAGEWIDTH (120) PAGELENGTH (65) CLASSES( ECODE(C:0x0 - C:0xfbfe), HCONST(C:0x0 - C:0xfbfe), XDATA(X:0x0 - X:0xfff), HDATA(X:0x0 - X:0xfff))
+
+*** ERROR L127: UNRESOLVED EXTERNAL SYMBOL
+    SYMBOL:  SILABS_STARTUP
+    MODULE:  ./src/SILABS_STARTUP.OBJ (?C_STARTUP)
+
+*** ERROR L128: REFERENCE MADE TO UNRESOLVED EXTERNAL
+    SYMBOL:  SILABS_STARTUP
+    MODULE:  ./src/SILABS_STARTUP.OBJ (?C_STARTUP)
+    ADDRESS: 10001C6H
+
+Program Size: data=29.5 xdata=20 const=0 code=1002
+LX51 RUN COMPLETE.  0 WARNING(S),  2 ERROR(S)
+make: *** [makefile:50: Lab5.omf] Error 1
+"make all" terminated with exit code 2. Build might be incomplete.
+
+11:27:45 Build Failed. 3 errors, 0 warnings. (took 1s.786ms)
+

@@ -1,0 +1,122 @@
+//-----------------------------------------------------------------------------
+// LAB4 - STUDENT template for tasks a,b,c: lines, text and smiley
+//----------------------------------------------------------------------------
+//  Copyright (C) Shenkar College
+//  Electronics & Electrical Engineering Department
+//  All rights reserved.
+//  Owner   :  Liviu Gal & Engr.Dmitry Ryzhkov
+//  FILE NAME    :  LAB4 template
+//  DATE         :  15/10/25
+//  TARGET MCU   :  EFM8UB20F64G-B-QFP48,  EFM8UB2-B-revA01
+//  DESCRIPTION  :  This program illustrates how to:
+//          - disable the watchdog timer,
+//          - using SPI serial communication,
+//
+//
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Resources
+//-----------------------------------------------------------------------------
+// SYSCLK - 48MHz HFOSC / 2
+// SPI0   - 1MHz
+// Timer2 - 2MHz (SPI CS delay)
+// Timer3 - 1KHz (1ms tick)
+// P0.1 - CS (Active High)
+// P0.6 - SCK
+// P1.0 - MOSI
+// P1.4 - Display enable
+//-----------------------------------------------------------------------------
+// Includes
+//-----------------------------------------------------------------------------
+#include "bsp.h"
+#include "InitDevice.h"
+#include "disp.h"
+#include "tick.h"
+#include "render.h"
+#define LCD_height 128
+//-----------------------------------------------------------------------------
+// SiLabs_Startup() Routine
+// ----------------------------------------------------------------------------
+// This function is called immediately after reset, before the initialization
+// code is run in SILABS_STARTUP.A51 (which runs before main() ). This is a
+// useful place to disable the watchdog timer, which is enable by default
+// and may trigger before main() in some instances.
+//-----------------------------------------------------------------------------
+void SiLabs_Startup (void)
+{
+  // Disable the watchdog here
+}
+ 
+//Students need to complete code in main program
+int main(void)
+{
+//define variable "line" to support text and graphics
+SI_SEGMENT_VARIABLE(line[DISP_BUF_SIZE], uint8_t, RENDER_LINE_SEG);
+
+//********* define your variables here
+
+  enter_DefaultMode_from_RESET();  // Enter default mode
+
+  IE_EA = 1;  // Enable all interrupts
+
+//init LCD
+  DISP_Init();
+  DISP_ClearAll();
+  line[7]=0x01;
+  DISP_WriteLine(0,line);
+  DISP_WriteLine(14,line);
+  line[8]=0xC0;
+  DISP_WriteLine(0,line);
+  line[7]=0x03;
+  DISP_WriteLine(1,line);
+  DISP_WriteLine(13,line);
+  line[8]=0xE0;
+  DISP_WriteLine(1,line);
+  line[7]=0x07;
+  DISP_WriteLine(2,line);
+  DISP_WriteLine(3,line);
+  DISP_WriteLine(12,line);
+  line[7]=0xE5;
+  DISP_WriteLine(4,line);
+  line[7]=0x75;
+  DISP_WriteLine(5,line);
+  line[7]=0x35;
+  DISP_WriteLine(6,line);
+  line[7]=0x3F;
+  DISP_WriteLine(7,line);
+  line[7]=0x1E;
+  DISP_WriteLine(8,line);
+  DISP_WriteLine(9,line);
+  line[7]=0x0F;
+  DISP_WriteLine(10,line);
+  DISP_WriteLine(11,line);
+  line[7]=0x00;
+  DISP_WriteLine(15,line);
+
+  line[8]=0xF0;
+  DISP_WriteLine(2,line);
+  DISP_WriteLine(3,line);
+  DISP_WriteLine(9,line);
+  DISP_WriteLine(10,line);
+  line[8]=0x77;
+  DISP_WriteLine(4,line);
+  line[8]=0x7E;
+  DISP_WriteLine(5,line);
+  line[8]=0x7C;
+  DISP_WriteLine(6,line);
+  line[8]=0xFC;
+  DISP_WriteLine(7,line);
+  DISP_WriteLine(14,line);
+  line[8]=0xF8;
+  DISP_WriteLine(8,line);
+  line[8]=0xF7;
+  DISP_WriteLine(11,line);
+  line[8]=0xFE;
+  DISP_WriteLine(12,line);
+  DISP_WriteLine(13,line);
+  line[8]=0x70;
+  DISP_WriteLine(15,line);
+
+
+  while(1);
+}

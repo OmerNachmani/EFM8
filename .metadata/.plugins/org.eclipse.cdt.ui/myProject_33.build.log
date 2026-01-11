@@ -1,0 +1,22 @@
+12:30:45 **** Incremental Build of configuration Keil 8051 v9.60.0 - Debug for project myProject_33 ****
+make all 
+PATH=/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN:/home/onachman/SimplicityStudio5/SimplicityStudio_v5/support/8051:/usr/bin:/usr/bin:/home/onachman/Siemens/Questa_Student/2024.2/questasim/bin:/home/onachman/bin:/home/onachman/.local/bin:/home/onachman/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/onachman/.lmstudio/bin:/home/onachman/.lmstudio/bin
+ 
+Building target: myProject_33.omf
+Invoking: Keil 8051 Linker
+wine "/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN/LX51" "@myProject_33.lnp" || test $? -lt 2
+
+LX51 LINKER/LOCATER V4.66.97.0 - SN: K1FVC-D03UZZ
+COPYRIGHT ARM Germany GmbH 1995 - 2019
+@myProject_33.lnp "./src/InitDevice.OBJ",
+"./src/Interrupts.OBJ",
+"./src/SILABS_STARTUP.OBJ",
+"./src/myProject_3_main.OBJ"
+TO "MYPROJECT_33.OMF.CRBUILD" REMOVEUNUSED PRINT(.\myProject_33.m51) PAGEWIDTH (120) PAGELENGTH (65) CLASSES( ECODE(C:0x0 - C:0xfbfe), HCONST(C:0x0 - C:0xfbfe), XDATA(X:0x0 - X:0xfff), HDATA(X:0x0 - X:0xfff))
+
+Program Size: data=10.0 xdata=0 const=0 code=143
+LX51 RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)
+Finished building target: myProject_33.omf
+
+12:30:46 Build Finished. 0 errors, 0 warnings. (took 1s.547ms)
+

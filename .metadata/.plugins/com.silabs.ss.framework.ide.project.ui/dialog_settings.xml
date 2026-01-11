@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="com.silabs.ss.framework.ide.project.ui.ExportSLSProjectsWizard">
+		<item key="lastFileLocation" value="/home/onachman/SimplicityStudio/v5_workspace"/>
+		<list key="fileLocationHistory">
+			<item value="/home/onachman/SimplicityStudio/v5_workspace"/>
+		</list>
+		<section name="ExportSLSArchivesWizard.dialogBounds">
+			<item key="DIALOG_X_ORIGIN" value="705"/>
+			<item key="DIALOG_Y_ORIGIN" value="-105"/>
+			<item key="DIALOG_WIDTH" value="525"/>
+			<item key="DIALOG_HEIGHT" value="688"/>
+			<item key="DIALOG_FONT_NAME" value="1|Noto Sans|10.0|0|GTK|1|"/>
+		</section>
+	</section>
+	<section name="buildConfig">
+		<item key="DIALOG_WIDTH" value="440"/>
+		<item key="DIALOG_HEIGHT" value="360"/>
+		<item key="DIALOG_FONT_NAME" value="1|Noto Sans|10.0|0|GTK|1|"/>
+	</section>
+</section>

@@ -1,0 +1,57 @@
+#include <SI_EFM8UB2_Register_Enums.h>
+#include "InitDevice.h"
+#include "tick.h"
+#include <stdint.h>
+
+// Definitions based on 4MHz PCA Clock
+#define FREQ_START 200   // Initial divider value (10 kHz)
+#define FREQ_STEP  20    // Increment/Decrement step for the divider
+#define FREQ_MIN   40    // Higher frequency limit (50 kHz) - Lower divider
+#define FREQ_MAX   250   // Lower frequency limit (8 kHz) - Higher divider
+
+// Bit definitions for Buttons
+SI_SBIT(BTN0, SFR_P0, 2); // Button 0: Increase Frequency (Decrease Divider)
+SI_SBIT(BTN1, SFR_P0, 3); // Button 1: Decrease Frequency (Increase Divider)
+
+
+void Set_PCA_Frequency(uint8_t divider) {
+    PCA0CPH0 = divider;
+}
+
+void main(void) {
+    uint8_t current_divider = FREQ_START;
+
+    // Initialize hardware peripherals from Configurator
+    enter_DefaultMode_from_RESET();
+    IE_EA = 1;
+
+    //Frequency Output Mode
+    PCA0CPM0 = 0xC6;
+
+    // Load initial frequency
+    Set_PCA_Frequency(current_divider);
+
+    while (1) {
+        // Check BTN0 - Increase Frequency
+        if (BTN0 == 0) {
+            // Ensure we don't go below the minimum divider (maximum frequency)
+            if (current_divider > (FREQ_MIN + FREQ_STEP)) {
+                current_divider -= FREQ_STEP;
+                Set_PCA_Frequency(current_divider);
+            }
+            // Delay for debouncing and to make the change visible on scope
+            Wait(300);
+        }
+
+        // Check BTN1 - Decrease Frequency
+        if (BTN1 == 0) {
+            // Ensure we don't exceed the maximum divider (minimum frequency)
+            if (current_divider < (FREQ_MAX - FREQ_STEP)) {
+                current_divider += FREQ_STEP;
+                Set_PCA_Frequency(current_divider);
+            }
+            // Delay for debouncing and to make the change visible on scope
+            Wait(300);
+        }
+    }
+}

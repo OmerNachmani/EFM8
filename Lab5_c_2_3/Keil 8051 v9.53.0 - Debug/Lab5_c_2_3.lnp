@@ -1,0 +1,11 @@
+"./lib/bsp/efm8_joystick/joystick.OBJ",
+"./lib/bsp/efm8_memory_lcd/src/disp.OBJ",
+"./lib/bsp/efm8_memory_lcd/src/render.OBJ",
+"./lib/bsp/efm8_rgb_led/rgb_led.OBJ",
+"./lib/efm8ub2/bsp/efm8_memory_lcd/src/spi.OBJ",
+"./lib/efm8ub2/bsp/efm8_memory_lcd/src/tick.OBJ",
+"./lib/efm8ub2/peripheralDrivers/src/spi_0.OBJ",
+"./src/InitDevice.OBJ",
+"./src/SILABS_STARTUP.OBJ",
+"./src/main.OBJ"
+TO "LAB5_C_2_3.OMF.CRBUILD" REMOVEUNUSED PRINT(.\Lab5_c_2_3.m51) PAGEWIDTH (120) PAGELENGTH (65) CLASSES( ECODE(C:0x0 - C:0xfbfe), HCONST(C:0x0 - C:0xfbfe), XDATA(X:0x0 - X:0xfff), HDATA(X:0x0 - X:0xfff))

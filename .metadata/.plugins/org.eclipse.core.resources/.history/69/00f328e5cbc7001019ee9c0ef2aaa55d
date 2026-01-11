@@ -1,0 +1,106 @@
+$INCLUDE (SI_EFM8UB2_Defs.inc)
+
+;-------------------------------------My defines---------------------------------------
+LED0 EQU P1.6   ; LED is connected to Port 1, Bit 6
+PB0 EQU P0.2    ; Push Button 0 (Start) connected to P0.2
+PB1 EQU P0.3    ; Push Button 1 (Stop) connected to P0.3
+
+; Calculation (approx 62,500 cycles @ 1.5 MHz):
+R0_VAL EQU 100  ; Outer loop constant
+R1_VAL EQU 10   ; Middle loop constant
+R2_VAL EQU 63   ; Inner loop constant (100 * 10 * 63 = 63,000 iterations approx.)
+FLAG EQU PSW.5  ; Flag (F0 bit in PSW) to control blinking state
+
+;--------------------------------------------------------------------------------------
+; RESET and INTERRUPT VECTORS
+;--------------------------------------------------------------------------------------
+CSEG AT 0               ; Reset Vector
+    LJMP MAIN           ; Jump to the start of the program
+
+ORG 03H                 ; External Interrupt 0 Vector (PB0)
+    LJMP EXT0_ISR       ; Jump to INT0 Service Routine
+
+ORG 13H                 ; External Interrupt 1 Vector (PB1)
+    LJMP EXT1_ISR       ; Jump to INT1 Service Routine
+
+ORG 0B3H                ; Start of main program code
+
+;--------------------------------------------------------------------------------------
+; Initialization
+;--------------------------------------------------------------------------------------
+Init_Device:
+    ANL PCA0MD, #~(040h)
+    MOV XBR1, #40h         ; Enable Crossbar
+
+
+    ORL P0MDIN, #04h ; P0.2 as Digital Input
+    ANL P0MDOUT, #~(04h) ;P0.2 as Open-Drain
+    ORL P0, #04h
+
+
+    ORL P0MDIN, #08h ;P0.3 as Digital Input
+    ANL P0MDOUT, #~(08h) ;P0.3 as Open-Drain
+    ORL P0, #08h
+
+
+    ORL P1MDIN, #40h ;P1.6 as Digital Input
+    ORL P1MDOUT, #40h ;P1.6 as Push-Pull Output
+
+    ; --- Interrupt Configuration ---
+    ORL IE, #85h        ; Enable Interrupts
+    MOV IT01CF, #32h    ; Configure INT1
+    CLR FLAG            ; Initialize Blinking Flag to OFF
+
+    RET
+
+; -------------------------------------------
+; DELAY Subroutine (~0.125s delay)
+; -------------------------------------------
+DELAY:
+    MOV R0, #R0_VAL
+R0_LOOP:
+    MOV R1, #R1_VAL
+R1_LOOP:
+    MOV R2, #R2_VAL
+R2_LOOP:
+    DJNZ R2, R2_LOOP  ; Inner loop (63 cycles)
+    DJNZ R1, R1_LOOP  ; Middle loop (10 times)
+    DJNZ R0, R0_LOOP  ; Outer loop (100 times)
+    cpl LED0 ; Toggle LED state
+    RET
+
+;--------------------------------------------------------------------------------------
+; CODE SEGMENT
+;--------------------------------------------------------------------------------------
+
+MAIN:
+    LCALL Init_Device   ; Configure I/O, Crossbar, and Interrupts.
+
+
+NO_BLINK:               ; State 1: Wait for PB0 press (INT0 sets FLAG).
+    jnb FLAG, NO_BLINK  ; Jump if FLAG is NOT Set (0). Stay here until FLAG=1.
+
+LOOP:                   ; State 2: Blinking loop.
+    LCALL DELAY         ; Toggle LED and run delay subroutine.
+
+; Check FLAG status: If INT1 was pressed, FLAG is cleared to 0, stopping the loop.
+    JB FLAG, LOOP       ; Jump if Bit is SET (1). If FLAG is still 1, repeat blinking.
+
+; If execution reaches here, FLAG is 0 (INT1 was triggered). Stop blinking.
+    SJMP NO_BLINK       ; Return to wait for the next START (PB0 press).
+
+sjmp $                  ; Endless loop = halt (Should be unreachable).
+
+;--------------------------------------------------------------------------------------
+; External Interrupt Service Routines
+;--------------------------------------------------------------------------------------
+EXT0_ISR:               ; Handles PB0 (Start) interrupt (INT0),
+    setb FLAG           ; Set FLAG (PSW.5) to indicate START BLINKING.
+    reti                ; Return from interrupt.
+
+EXT1_ISR:               ; Handles PB1 (Stop) interrupt (INT1),
+    clr FLAG            ; Clear FLAG (PSW.5) to indicate STOP BLINKING.
+    reti                ; Return from interrupt.
+
+END
+

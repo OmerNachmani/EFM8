@@ -1,0 +1,11 @@
+protectFromDetectionUpdates=false
+label=J-Link Silicon Labs (440338344)
+boardOverrides {
+}
+EXTENSION:com.silabs.ss.support.mcu.internal.api.part.core.MCUDeviceSettingExtension {
+  tifId:c2
+}
+EXTENSION:com.silabs.ss.support.dci.internal.part.core.SecurePartSettingExtension {
+}
+EXTENSION:com.silabs.ss.support.jlink.internal.api.core.JLinkDeviceSettingsExtension {
+}

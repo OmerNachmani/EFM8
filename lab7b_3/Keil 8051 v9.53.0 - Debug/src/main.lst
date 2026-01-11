@@ -1,0 +1,139 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              01/10/2026 19:44:05 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\src/main.OBJ
+COMPILER INVOKED BY: Z:\home\onachman\SimplicityStudio5\SimplicityStudio_v5\developer\toolchains\keil_8051\9.60\BIN\C51 
+                    -/home/onachman/SimplicityStudio/v5_workspace/lab7b_3/src/main.c OMF2 SMALL DEBUG OBJECTEXTEND ROM(LARGE) WARNINGLEVEL(2)
+                    - FLOATFUZZY(3) OPTIMIZE(8,SPEED) INTVECTOR(0X0000) INTPROMOTE INCDIR(/home/onachman/SimplicityStudio/v5_workspace/lab7b_
+                    -3/inc;/home/onachman/SimplicityStudio/v5_workspace/lab7b_3/inc/config;/home/onachman/SimplicityStudio5/SimplicityStudio_
+                    -v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc;/home/onachman/SimplicityStudio5/SimplicityStudio
+                    -_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc/graphics;/home/onachman/SimplicityStudio5/Simpli
+                    -cityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc/config;/home/onachman/SimplicityStudio
+                    -5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/bsp;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/d
+                    -eveloper/sdks/8051/v4.3.1//kits/EFM8UB2_SLSTK2001A/config;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer
+                    -/sdks/8051/v4.3.1//Device/shared/si8051Base;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.
+                    -3.1//Device/EFM8UB2/inc;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/dri
+                    -vers/efm8_joystick;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/
+                    -efm8_rgb_led;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//Device/EFM8UB2/peripheral_
+                    -driver/inc) PRINT(.\src/main.lst) COND PAGEWIDTH(120) PAGELENGTH(65) OBJECT(.\src/main.OBJ)
+
+line level    source
+
+   1          #include <SI_EFM8UB2_Register_Enums.h>
+   2          #include "InitDevice.h"
+   3          
+   4          // Hardware Pin Definitions
+   5          SI_SBIT(PB0, SFR_P0, 2); // Left input
+   6          SI_SBIT(PB1, SFR_P0, 3); // Right input
+   7          
+   8          // PCA Capture/Compare values for Servo positioning
+   9          // Clock source: 4MHz.
+  10          // Target pulse widths: 0.6ms (Min), 1.5ms (Mid), 2.4ms (Max)
+  11          #define TICKS_AT_0_DEG    63136
+  12          #define TICKS_AT_90_DEG   59536
+  13          #define TICKS_AT_180_DEG  55936
+  14          
+  15          // ----------------------------------------------------------------------------
+  16          // Function Declarations
+  17          // ----------------------------------------------------------------------------
+  18          void SiLabs_Startup(void);
+  19          void Update_PCA_Comparator(uint16_t compare_value);
+  20          void Simple_Wait(uint16_t duration);
+  21          
+  22          // ----------------------------------------------------------------------------
+  23          // Startup Routine
+  24          // ----------------------------------------------------------------------------
+  25          void SiLabs_Startup(void)
+  26          {
+  27   1          // Stop the Watchdog Timer to prevent system reset
+  28   1          PCA0MD &= ~0x40;
+  29   1      }
+  30          
+  31          // ----------------------------------------------------------------------------
+  32          // Utility Functions
+  33          // ----------------------------------------------------------------------------
+  34          
+  35          // Loads a 16-bit value into the PCA0 Capture/Compare registers
+  36          void Update_PCA_Comparator(uint16_t compare_value)
+  37          {
+  38   1          PCA0CPL0 = (compare_value & 0x00FF); // Load lower byte
+  39   1          PCA0CPH0 = (compare_value >> 8);     // Load upper byte
+  40   1      }
+  41          
+  42          // Basic software delay loop
+  43          void Simple_Wait(uint16_t duration)
+C51 COMPILER V9.60.0.0   MAIN                                                              01/10/2026 19:44:05 PAGE 2   
+
+  44          {
+  45   1          uint16_t cycle_a;
+  46   1          volatile uint16_t cycle_b;
+  47   1      
+  48   1          for(cycle_a = 0; cycle_a < duration; cycle_a++)
+  49   1          {
+  50   2              // Internal loop tuned for approximate timing
+  51   2              for(cycle_b = 0; cycle_b < 4000; cycle_b++);
+  52   2          }
+  53   1      }
+  54          
+  55          // ----------------------------------------------------------------------------
+  56          // Main Application
+  57          // ----------------------------------------------------------------------------
+  58          void main(void)
+  59          {
+  60   1          enter_DefaultMode_from_RESET();
+  61   1      
+  62   1          // -- Hardware Configuration --
+  63   1          XBR1 |= 0x40;      // Activate Crossbar to route signals
+  64   1          PCA0CPM0 = 0xC2;   // Configure Channel 0 for 16-bit Pulse Width Modulation
+  65   1          IE_EA = 1;         // Enable global interrupt handling
+  66   1      
+  67   1          // -- Initial State --
+  68   1          // Set servo to neutral position immediately
+  69   1          Update_PCA_Comparator(TICKS_AT_90_DEG);
+  70   1          Simple_Wait(500);
+  71   1      
+  72   1          while (1)
+  73   1          {
+  74   2              // 1. Dual Press Detection
+  75   2              // If both inputs are active, force return to neutral
+  76   2              if ((PB0 == 0) && (PB1 == 0))
+  77   2              {
+  78   3                  Update_PCA_Comparator(TICKS_AT_90_DEG);
+  79   3                  Simple_Wait(50);
+  80   3              }
+  81   2              // 2. Left Input Detected
+  82   2              else if (PB0 == 0)
+  83   2              {
+  84   3                  Update_PCA_Comparator(TICKS_AT_0_DEG);
+  85   3              }
+  86   2              // 3. Right Input Detected
+  87   2              else if (PB1 == 0)
+  88   2              {
+  89   3                  Update_PCA_Comparator(TICKS_AT_180_DEG);
+  90   3              }
+  91   2      
+  92   2              // Stabilization delay between polling
+  93   2              Simple_Wait(20);
+  94   2          }
+  95   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    126    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.0.0   MAIN                                                              01/10/2026 19:44:05 PAGE 3   
+
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

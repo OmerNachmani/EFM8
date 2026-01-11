@@ -1,0 +1,54 @@
+#include <SI_EFM8UB2_Register_Enums.h>
+#include "InitDevice.h"
+#include "tick.h"
+#include <stdint.h>
+
+// הגדרות גבולות וערכים (ניתן לשנות לפי הצורך)
+#define VAL_START 100
+#define VAL_STEP  10
+#define VAL_MIN   10    // תדר מקסימלי (מחלק קטן = תדר גבוה)
+#define VAL_MAX   250   // תדר מינימלי (מחלק גדול = תדר נמוך)
+
+SI_SBIT(BTN0, SFR_P0, 2);
+SI_SBIT(BTN1, SFR_P0, 3);
+
+void Set_Frequency_Divider(uint8_t divider) {
+    // במוד Frequency, כותבים ל-PCA0CPH0
+    // הערך ב-CPL0 קובע את ה-Phase הראשוני, CPH0 קובע את התדר
+    PCA0CPH0 = divider;
+}
+
+void main(void) {
+    uint8_t current_divider = VAL_START;
+
+    enter_DefaultMode_from_RESET();
+
+    // חשוב! הפעלת פסיקות גלובליות עבור ה-Wait()
+    IE_EA = 1;
+
+    // הגדרת ערוץ 0 למוד Frequency Output
+    // ECOM=1 (Enable Comparator), TOG=1 (Enable Toggle)
+    PCA0CPM0 = 0xC6;
+
+    Set_Frequency_Divider(current_divider);
+
+    while (1) {
+        // לחצן BTN0 - הגדלת תדר (הקטנת המחלק)
+        if (BTN0 == 0) {
+            if (current_divider > (VAL_MIN + VAL_STEP)) {
+                current_divider -= VAL_STEP;
+                Set_Frequency_Divider(current_divider);
+            }
+            Wait(250); // השהייה למניעת קפיצות מהירות מדי ודיבאונס
+        }
+
+        // לחצן BTN1 - הקטנת תדר (הגדלת המחלק)
+        if (BTN1 == 0) {
+            if (current_divider < (VAL_MAX - VAL_STEP)) {
+                current_divider += VAL_STEP;
+                Set_Frequency_Divider(current_divider);
+            }
+            Wait(250);
+        }
+    }
+}

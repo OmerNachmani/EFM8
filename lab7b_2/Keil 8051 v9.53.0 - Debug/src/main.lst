@@ -1,0 +1,167 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              01/10/2026 19:38:49 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\src/main.OBJ
+COMPILER INVOKED BY: Z:\home\onachman\SimplicityStudio5\SimplicityStudio_v5\developer\toolchains\keil_8051\9.60\BIN\C51 
+                    -/home/onachman/SimplicityStudio/v5_workspace/lab7b_2/src/main.c OMF2 SMALL DEBUG OBJECTEXTEND ROM(LARGE) WARNINGLEVEL(2)
+                    - FLOATFUZZY(3) OPTIMIZE(8,SPEED) INTVECTOR(0X0000) INTPROMOTE INCDIR(/home/onachman/SimplicityStudio/v5_workspace/lab7b_
+                    -2/inc;/home/onachman/SimplicityStudio/v5_workspace/lab7b_2/inc/config;/home/onachman/SimplicityStudio5/SimplicityStudio_
+                    -v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc;/home/onachman/SimplicityStudio5/SimplicityStudio
+                    -_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc/graphics;/home/onachman/SimplicityStudio5/Simpli
+                    -cityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc/config;/home/onachman/SimplicityStudio
+                    -5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/bsp;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/d
+                    -eveloper/sdks/8051/v4.3.1//kits/EFM8UB2_SLSTK2001A/config;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer
+                    -/sdks/8051/v4.3.1//Device/shared/si8051Base;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.
+                    -3.1//Device/EFM8UB2/inc;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/dri
+                    -vers/efm8_joystick;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/
+                    -efm8_rgb_led;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//Device/EFM8UB2/peripheral_
+                    -driver/inc) PRINT(.\src/main.lst) COND PAGEWIDTH(120) PAGELENGTH(65) OBJECT(.\src/main.OBJ)
+
+line level    source
+
+   1          /*
+   2           * -------------------------------------------------------------------------------------
+   3           * – Так что же? Разве несовершенно само искусство врачева�
+             -�ия?
+   4           *
+   5           * Бывает ли вообще нужно дополнять любое искусство еще ка�
+             -�им-нибудь положительным
+   6           * качеством, как глаза – зрением, а уши – слухом? Нужно ли �
+             -�оэтому к любому
+   7           * искусству добавлять еще какое-нибудь другое искусство, �
+             -�оторое решало бы,
+   8           * что пригодно для первого и чем его надо восполнить?
+   9           *
+  10           * Разве в самом искусстве скрыто какое-то несовершенство �
+             -� любое искусство
+  11           * нуждается еще в другом искусстве, которое обсуждало бы, �
+             -�то полезно тому,
+  12           * первому? А для этого обсуждающего искусства необходимо �
+             -� свою очередь еще
+  13           * другое подобного же рода искусство и так до бесконечнос�
+             -�и?
+  14           *
+  15           * Или же всякое искусство само по себе решает, что для него
+             - пригодно? Или же для
+  16           * обсуждения того, что исправит его недостатки, ему не тре�
+             -�уется ни самого себя,
+  17           * ни другого искусства? Ведь у искусства не бывает никаког
+             -о несовершенства или
+  18           * погрешности и ему не годится изыскивать пригодное за пр�
+             -�делами себя самого.
+  19           *
+  20           * Раз оно правильно, в нем нет ущерба и искажений, пока оно 
+             -сохраняет свою
+  21           * безупречность и целостность. Рассмотри это в точном, уст
+             -ановленном тобой
+  22           * смысле слова – так это будет или по-другому?
+  23           * -------------------------------------------------------------------------------------
+  24           */
+  25          #include <SI_EFM8UB2_Register_Enums.h>
+  26          #include "InitDevice.h"
+  27          
+  28          // Buttons
+  29          SI_SBIT(PB0, SFR_P0, 2); // Button Left
+C51 COMPILER V9.60.0.0   MAIN                                                              01/10/2026 19:38:49 PAGE 2   
+
+  30          SI_SBIT(PB1, SFR_P0, 3); // Button Right
+  31          
+  32          // PWM Values for SG90 Servo (Extended Range: 0.6ms - 2.4ms)
+  33          // PCA Clock = 4MHz. Formula: 65536 - (Time_us / 0.25)
+  34          #define SERVO_POS_0   63136  // ~0 degrees
+  35          #define SERVO_POS_90  59536  // 90 degrees (Center)
+  36          #define SERVO_POS_180 55936  // ~180 degrees
+  37          
+  38          //-----------------------------------------------------------------------------
+  39          // Function Prototypes
+  40          //-----------------------------------------------------------------------------
+  41          void SiLabs_Startup(void);
+  42          void Set_Servo_PWM(uint16_t val);
+  43          void Delay_ms(uint16_t ms);
+  44          
+  45          //-----------------------------------------------------------------------------
+  46          // SiLabs_Startup (Required to disable Watchdog)
+  47          //-----------------------------------------------------------------------------
+  48          void SiLabs_Startup (void)
+  49          {
+  50   1          PCA0MD &= ~0x40; // Disable WDT
+  51   1      }
+  52          
+  53          //-----------------------------------------------------------------------------
+  54          // Helper Functions
+  55          //-----------------------------------------------------------------------------
+  56          void Set_Servo_PWM(uint16_t val)
+  57          {
+  58   1          PCA0CPL0 = (val & 0x00FF);
+  59   1          PCA0CPH0 = (val >> 8);
+  60   1      }
+  61          
+  62          void Delay_ms(uint16_t ms)
+  63          {
+  64   1          uint16_t i;
+  65   1          volatile uint16_t j;
+  66   1          for(i = 0; i < ms; i++)
+  67   1          {
+  68   2              for(j = 0; j < 4000; j++);
+  69   2          }
+  70   1      }
+  71          
+  72          //-----------------------------------------------------------------------------
+  73          // Main Loop
+  74          //-----------------------------------------------------------------------------
+  75          void main (void)
+  76          {
+  77   1          enter_DefaultMode_from_RESET();
+  78   1      
+  79   1          // Force Settings
+  80   1          XBR1 |= 0x40;    // Enable Crossbar
+  81   1          PCA0CPM0 = 0xC2; // Enable 16-bit PWM
+  82   1          IE_EA = 1;       // Enable Interrupts
+  83   1      
+  84   1          // Start at Center
+  85   1          Set_Servo_PWM(SERVO_POS_90);
+  86   1          Delay_ms(500);
+  87   1      
+  88   1          while (1)
+  89   1          {
+  90   2              // 1. Check BOTH buttons (Priority: Return to Center)
+  91   2              if ((PB0 == 0) && (PB1 == 0))
+  92   2              {
+C51 COMPILER V9.60.0.0   MAIN                                                              01/10/2026 19:38:49 PAGE 3   
+
+  93   3                  Set_Servo_PWM(SERVO_POS_90);
+  94   3                  Delay_ms(50);
+  95   3              }
+  96   2              // 2. Check Button 0 (Move Left)
+  97   2              else if (PB0 == 0)
+  98   2              {
+  99   3                  Set_Servo_PWM(SERVO_POS_0);
+ 100   3              }
+ 101   2              // 3. Check Button 1 (Move Right)
+ 102   2              else if (PB1 == 0)
+ 103   2              {
+ 104   3                  Set_Servo_PWM(SERVO_POS_180);
+ 105   3              }
+ 106   2      
+ 107   2              Delay_ms(20);
+ 108   2          }
+ 109   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    126    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

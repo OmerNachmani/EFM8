@@ -1,0 +1,147 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              12/05/2025 16:16:25 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\src/main.OBJ
+COMPILER INVOKED BY: Z:\home\onachman\SimplicityStudio5\SimplicityStudio_v5\developer\toolchains\keil_8051\9.60\BIN\C51 
+                    -/home/onachman/SimplicityStudio/v5_workspace/Lab4_Example_2025_4/src/main.c OMF2 SMALL DEBUG OBJECTEXTEND ROM(LARGE) WAR
+                    -NINGLEVEL(2) FLOATFUZZY(3) OPTIMIZE(8,SPEED) INTVECTOR(0X0000) INTPROMOTE INCDIR(/home/onachman/SimplicityStudio/v5_work
+                    -space/Lab4_Example_2025_4/inc;/home/onachman/SimplicityStudio/v5_workspace/Lab4_Example_2025_4/inc/config;/home/onachman
+                    -/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc;/home/onachma
+                    -n/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc/graphics;/ho
+                    -me/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc/co
+                    -nfig;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/bsp;/home/onachman/Sim
+                    -plicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/EFM8UB2_SLSTK2001A/config;/home/onachman/SimplicityS
+                    -tudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//Device/shared/si8051Base;/home/onachman/SimplicityStudio5/Simplic
+                    -ityStudio_v5/developer/sdks/8051/v4.3.1//Device/EFM8UB2/inc;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/develop
+                    -er/sdks/8051/v4.3.1//kits/common/drivers/efm8_joystick;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sd
+                    -ks/8051/v4.3.1//kits/common/drivers/efm8_rgb_led;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/805
+                    -1/v4.3.1//Device/EFM8UB2/peripheral_driver/inc) PRINT(.\src/main.lst) COND PAGEWIDTH(120) PAGELENGTH(65) OBJECT(.\src/ma
+                    -in.OBJ)
+
+line level    source
+
+   1          //-----------------------------------------------------------------------------
+   2          // LAB4 - LCD Text Display
+   3          // MCU: EFM8UB20F64G-B-QFP48
+   4          //-----------------------------------------------------------------------------
+   5          
+   6          //-----------------------------------------------------------------------------
+   7          // Resources
+   8          //-----------------------------------------------------------------------------
+   9          // SYSCLK - 48MHz HFOSC / 2
+  10          // SPI0   - 1MHz
+  11          // Timer2 - 2MHz (SPI CS delay)
+  12          // Timer3 - 1KHz (1ms tick)
+  13          // P0.1   - CS (Active High)
+  14          // P0.6   - SCK
+  15          // P1.0   - MOSI
+  16          // P1.4   - Display enable
+  17          //-----------------------------------------------------------------------------
+  18          
+  19          #include "bsp.h"
+  20          #include "InitDevice.h"
+  21          #include "disp.h"
+  22          #include "tick.h"
+  23          #include "render.h"
+  24          
+  25          #define LCD_height 128
+  26          
+  27          //-----------------------------------------------------------------------------
+  28          // Global variables
+  29          //-----------------------------------------------------------------------------
+  30          SI_SEGMENT_VARIABLE(line[DISP_BUF_SIZE], uint8_t, RENDER_LINE_SEG); // LCD Line buffer
+  31          
+  32          //-----------------------------------------------------------------------------
+  33          // SiLabs_Startup() Routine
+  34          //-----------------------------------------------------------------------------
+  35          void SiLabs_Startup (void)
+  36          {
+  37   1        // Watchdog disabled via Configurator
+  38   1      }
+  39          
+  40          //-----------------------------------------------------------------------------
+  41          // write_text_row()
+  42          // Description: Writes a string to a specific text row index.
+C51 COMPILER V9.60.0.0   MAIN                                                              12/05/2025 16:16:25 PAGE 2   
+
+  43          // text_row: Row index (0-15)
+  44          // col: Starting pixel column
+  45          // text: String to display
+  46          //-----------------------------------------------------------------------------
+  47          void write_text_row(uint8_t text_row, uint8_t col, char* text)
+  48          {
+  49   1        uint8_t y;
+  50   1        uint8_t i;
+  51   1        uint8_t base_row;
+  52   1      
+  53   1        // Convert text row index to absolute pixel row
+  54   1        base_row = text_row * FONT_HEIGHT;
+  55   1      
+  56   1        for (y = 0; y < FONT_HEIGHT; y++)
+  57   1        {
+  58   2          // Clear buffer before rendering new slice
+  59   2          for (i = 0; i < DISP_BUF_SIZE; i++)
+  60   2          {
+  61   3            line[i] = 0x00;
+  62   3          }
+  63   2      
+  64   2          // Render the specific font slice (y) into the buffer
+  65   2          RENDER_StrLine(line, col, y, text);
+  66   2      
+  67   2          // Write the buffer to the physical LCD line
+  68   2          DISP_WriteLine(base_row + y, line);
+  69   2        }
+  70   1      }
+  71          
+  72          //-----------------------------------------------------------------------------
+  73          // main()
+  74          //-----------------------------------------------------------------------------
+  75          int main(void)
+  76          {
+  77   1        // Hardware Initialization
+  78   1        enter_DefaultMode_from_RESET();
+  79   1      
+  80   1        // Enable global interrupts
+  81   1        IE_EA = 1;
+  82   1      
+  83   1        // Initialize LCD and clear screen
+  84   1        DISP_Init();
+  85   1        DISP_ClearAll();
+  86   1      
+  87   1        // --- Display Text ---
+  88   1      
+  89   1        // Row 0: Title
+  90   1        write_text_row(0, 0, "Shenkar COLLEGE");
+  91   1      
+  92   1        // Row 10: Student Name
+  93   1        write_text_row(9, 0, "Eden Eli");
+  94   1        write_text_row(10, 0, "Omer Nachmani");
+  95   1        write_text_row(11, 0, "Erez with E");
+  96   1      
+  97   1      
+  98   1        while (1)
+  99   1        {
+ 100   2           // Main loop
+ 101   2        }
+ 102   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+C51 COMPILER V9.60.0.0   MAIN                                                              12/05/2025 16:16:25 PAGE 3   
+
+   CODE SIZE        =    148    ----
+   CONSTANT SIZE    =     51    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       6
+   IDATA SIZE       =     16    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

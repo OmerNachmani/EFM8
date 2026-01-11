@@ -1,0 +1,83 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              01/02/2026 11:27:44 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\src/main.OBJ
+COMPILER INVOKED BY: Z:\home\onachman\SimplicityStudio5\SimplicityStudio_v5\developer\toolchains\keil_8051\9.60\BIN\C51 
+                    -/home/onachman/SimplicityStudio/v5_workspace/Lab5/src/main.c OMF2 SMALL DEBUG OBJECTEXTEND ROM(LARGE) WARNINGLEVEL(2) FL
+                    -OATFUZZY(3) OPTIMIZE(8,SPEED) INTVECTOR(0X0000) INTPROMOTE INCDIR(/home/onachman/SimplicityStudio/v5_workspace/Lab5/inc;
+                    -/home/onachman/SimplicityStudio/v5_workspace/Lab5/inc/config;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/develo
+                    -per/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/devel
+                    -oper/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc/graphics;/home/onachman/SimplicityStudio5/SimplicityStudi
+                    -o_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_memory_lcd/inc/config;/home/onachman/SimplicityStudio5/Simplic
+                    -ityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/bsp;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/
+                    -sdks/8051/v4.3.1//kits/EFM8UB2_SLSTK2001A/config;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/805
+                    -1/v4.3.1//Device/shared/si8051Base;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//Devi
+                    -ce/EFM8UB2/inc;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8
+                    -_joystick;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//kits/common/drivers/efm8_rgb_
+                    -led;/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/sdks/8051/v4.3.1//Device/EFM8UB2/peripheral_driver/in
+                    -c) PRINT(.\src/main.lst) COND PAGEWIDTH(120) PAGELENGTH(65) OBJECT(.\src/main.OBJ)
+
+line level    source
+
+   1          #include <SI_EFM8UB2_Register_Enums.h>
+   2          #include "InitDevice.h"
+   3          #include "tick.h"
+   4          
+   5          // Define Control Pins
+   6          SI_SBIT(M_IN1, SFR_P0, 4);  // Direction Pin 1
+   7          SI_SBIT(M_IN2, SFR_P0, 5);  // Direction Pin 2
+   8          SI_SBIT(BTN0, SFR_P0, 2);   // PB0: Spin Right
+   9          SI_SBIT(BTN1, SFR_P0, 3);   // PB1: Spin Left
+  10          
+  11          void main(void) {
+  12   1          uint8_t joystick_val;
+  13   1      
+  14   1          enter_DefaultMode_from_RESET();
+  15   1          IE_EA = 1;
+  16   1      
+  17   1          // Initial State: Stopped
+  18   1          M_IN1 = 0;
+  19   1          M_IN2 = 0;
+  20   1      
+  21   1          while (1) {
+  22   2              // 1. Direction Control (Buttons)
+  23   2              if (BTN0 == 0) { // Right
+  24   3                  M_IN1 = 1; M_IN2 = 0;
+  25   3              }
+  26   2              else if (BTN1 == 0) { // Left
+  27   3                  M_IN1 = 0; M_IN2 = 1;
+  28   3              }
+  29   2      
+  30   2              // 2. Speed Control (Joystick ADC)
+  31   2              // Your InitDevice.c sets ADC0 to trigger on Timer 0
+  32   2              if (ADC0CN0_ADINT) {        // Check if conversion is complete
+  33   3                  ADC0CN0_ADINT = 0;      // Clear flag
+  34   3                  joystick_val = ADC0H;   // Get 8-bit MSB of joystick
+  35   3      
+  36   3                  // PCA0CPH0 controls the PWM duty cycle on P0.1 [cite: 152, 158]
+  37   3                  // Note: In 8-bit PWM, 0 is full speed, 255 is stop.
+  38   3                  PCA0CPH0 = joystick_val;
+  39   3              }
+  40   2          }
+  41   1      }
+
+
+C51 COMPILER V9.60.0.0   MAIN                                                              01/02/2026 11:27:44 PAGE 2   
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     36    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

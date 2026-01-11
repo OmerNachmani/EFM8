@@ -1,0 +1,43 @@
+11:32:48 **** Incremental Build of configuration Keil 8051 v9.60.0 - Debug for project myProject_3_2 ****
+make all 
+PATH=/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN:/home/onachman/SimplicityStudio5/SimplicityStudio_v5/support/8051:/usr/bin:/usr/bin:/home/onachman/Siemens/Questa_Student/2024.2/questasim/bin:/home/onachman/bin:/home/onachman/.local/bin:/home/onachman/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/onachman/.lmstudio/bin:/home/onachman/.lmstudio/bin
+ 
+Building target: myProject_3_2.omf
+Invoking: Keil 8051 Linker
+wine "/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN/LX51" "@myProject_3_2.lnp" || test $? -lt 2
+
+LX51 LINKER/LOCATER V4.66.97.0 - SN: K1FVC-D03UZZ
+COPYRIGHT ARM Germany GmbH 1995 - 2019
+@myProject_3_2.lnp "./src/InitDevice.OBJ",
+"./src/Interrupts.OBJ",
+"./src/SILABS_STARTUP.OBJ",
+"./src/myProject_3_main.OBJ"
+TO "MYPROJECT_3_2.OMF.CRBUILD" REMOVEUNUSED PRINT(.\myProject_3_2.m51) PAGEWIDTH (120) PAGELENGTH (65) CLASSES( ECODE(C:0x0 - C:0xfbfe), HCONST(C:0x0 - C:0xfbfe), XDATA(X:0x0 - X:0xfff), HDATA(X:0x0 - X:0xfff))
+
+*** ERROR L104: MULTIPLE PUBLIC DEFINITIONS
+    SYMBOL:  TIMER1_ISR
+    MODULE:  ./src/myProject_3_main.OBJ (MYPROJECT_3_MAIN)
+   DEFINED:  ./src/Interrupts.OBJ (INTERRUPTS)
+
+*** ERROR L104: MULTIPLE PUBLIC DEFINITIONS
+    SYMBOL:  TIMER0_ISR
+    MODULE:  ./src/myProject_3_main.OBJ (MYPROJECT_3_MAIN)
+   DEFINED:  ./src/Interrupts.OBJ (INTERRUPTS)
+
+*** WARNING L30: MEMORY SPACE OVERLAP
+    SEG:     ?INTERRUPTS?0000B
+    FROM:    C:00000BH   
+    TO:      C:00000EH   
+
+*** WARNING L30: MEMORY SPACE OVERLAP
+    SEG:     ?INTERRUPTS?0001B
+    FROM:    C:00001BH   
+    TO:      C:00001EH   
+
+Program Size: data=10.0 xdata=0 const=0 code=166
+LX51 RUN COMPLETE.  2 WARNING(S),  2 ERROR(S)
+make: *** [makefile:45: myProject_3_2.omf] Error 1
+"make all" terminated with exit code 2. Build might be incomplete.
+
+11:32:49 Build Failed. 3 errors, 2 warnings. (took 1s.544ms)
+

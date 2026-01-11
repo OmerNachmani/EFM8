@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;myProject_3/brd5001b_efm8ub20f64g-b-qfp48.hwconf&apos; to &apos;lab_3.hwconf&apos;" description="Rename resource &apos;brd5001b_efm8ub20f64g-b-qfp48.hwconf&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="brd5001b_efm8ub20f64g-b-qfp48.hwconf" name="lab_3.hwconf" stamp="1763712815120" updateReferences="true"/>
+</session>

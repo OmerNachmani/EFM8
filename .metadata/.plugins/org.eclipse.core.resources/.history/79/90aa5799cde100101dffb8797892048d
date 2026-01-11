@@ -1,0 +1,78 @@
+#include "bsp.h"
+#include "InitDevice.h"
+#include "disp.h"
+#include "tick.h"
+#include "render.h"
+#include "stdio.h"
+#include "SI_EFM8UB2_Register_Enums.h"
+
+/* ----------------------------------------------------------------------------
+   Hardware & Sensor Constants
+   ---------------------------------------------------------------------------- */
+#define SUPPLY_VOLTS_MV  3300    // Operating voltage in millivolts
+#define RESOLUTION_MAX   1023    // Maximum value for 10-bit ADC
+#define GLYPH_HEIGHT     8       // Vertical pixel count for LCD font
+#define TEMP_COEFF       0.01    // LM35 conversion factor: 10mV per degree
+
+// Buffer for rendering display lines
+SI_SEGMENT_VARIABLE(displayBuffer[DISP_BUF_SIZE], uint8_t, RENDER_LINE_SEG);
+
+/* Bit-addressable registers */
+sbit adcDoneFlag = ADC0CN0 ^ 5;  // Flag indicates ADC conversion is finished
+sbit runTimer0   = TCON ^ 4;     // Control bit to enable Timer0
+
+void main(void)
+{
+    uint16_t rawAdcData;         // Stores the direct reading from ADC0
+    float calculatedVolts;       // Stores voltage after scaling
+    float tempCelsius;           // Stores final temperature reading
+    char outputString[DISP_BUF_SIZE]; // String buffer for display text
+    uint8_t rowIdx;
+
+    /* Initialize microcontroller peripherals */
+    enter_DefaultMode_from_RESET();
+    DISP_Init();
+    DISP_ClearAll();
+
+    /* Display static group identification message */
+    for (rowIdx = 0; rowIdx < GLYPH_HEIGHT; rowIdx++)
+    {
+        RENDER_StrLine(displayBuffer, 3, rowIdx, "We are group 6");
+        DISP_WriteLine(25 + rowIdx, displayBuffer);
+    }
+
+    /* Hardware Setup */
+    PCA0MD &= ~0x40;             // Disable the Watchdog Timer
+    IE_EA = 1;                   // Enable global interrupt processing
+    runTimer0 = 1;               // Begin Timer0 operation to trigger ADC
+
+    /* Primary Execution Loop */
+    while (1)
+    {
+        // Poll for completed ADC conversion
+        if (adcDoneFlag)
+        {
+            /* Retrieve data from ADC register */
+            rawAdcData = ADC0;
+
+            /* Calculate voltage based on reference and resolution */
+            calculatedVolts = ((float)rawAdcData * SUPPLY_VOLTS_MV) / RESOLUTION_MAX / 1000.0;
+
+            /* Determine temperature based on LM35 sensitivity */
+            tempCelsius = calculatedVolts / TEMP_COEFF;
+
+            /* Prepare the formatted data string */
+            sprintf(outputString, "V=%.2fV T=%.1fC", calculatedVolts, tempCelsius);
+
+            /* Refresh the dynamic measurement area on the LCD */
+            for (rowIdx = 0; rowIdx < GLYPH_HEIGHT; rowIdx++)
+            {
+                RENDER_StrLine(displayBuffer, 3, rowIdx, outputString);
+                DISP_WriteLine(4 + rowIdx, displayBuffer);
+            }
+
+            /* Reset the flag to wait for the next trigger */
+            adcDoneFlag = 0;
+        }
+    }
+}

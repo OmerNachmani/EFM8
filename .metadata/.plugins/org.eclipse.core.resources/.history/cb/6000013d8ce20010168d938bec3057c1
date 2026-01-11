@@ -1,0 +1,50 @@
+#include <SI_EFM8UB2_Register_Enums.h>
+#include "InitDevice.h"
+#include "tick.h"
+#include <stdint.h>
+
+#define VAL_START 100
+#define VAL_STEP  10
+#define VAL_MIN   10
+#define VAL_MAX   250
+
+SI_SBIT(BTN0, SFR_P0, 2);
+SI_SBIT(BTN1, SFR_P0, 3);
+
+void Set_Frequency_Divider(uint8_t divider) {
+
+    PCA0CPH0 = divider;
+}
+
+void main(void) {
+    uint8_t current_divider = VAL_START;
+
+    enter_DefaultMode_from_RESET();
+
+    IE_EA = 1;
+
+    PCA0CPM0 = 0xC6;
+
+    Set_Frequency_Divider(current_divider);
+
+    while (1) {
+        if (BTN0 == 0) {
+            if (current_divider > (VAL_MIN + VAL_STEP)) {
+                current_divider -= VAL_STEP;
+                Set_Frequency_Divider(current_divider);
+            }
+            Wait(250);
+        }
+
+        if (BTN1 == 0) {
+            if (current_divider < (VAL_MAX - VAL_STEP)) {
+                current_divider += VAL_STEP;
+                Set_Frequency_Divider(current_divider);
+            }
+            Wait(250);
+        }
+    }
+}
+
+
+

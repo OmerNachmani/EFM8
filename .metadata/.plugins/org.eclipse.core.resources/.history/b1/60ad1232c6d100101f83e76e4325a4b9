@@ -1,0 +1,118 @@
+//-----------------------------------------------------------------------------
+// LAB4 - STUDENT Task Solution: Moving Ghost
+//-----------------------------------------------------------------------------
+// Includes
+//-----------------------------------------------------------------------------
+#include "bsp.h"
+#include "InitDevice.h"
+#include "disp.h"
+#include "tick.h"
+#include "render.h"
+#include <string.h> // For memset
+
+#define LCD_height 128
+#define GHOST_HEIGHT 16
+#define MAX_COL 14  // Width in bytes (assuming 128px width / 8 bits = 16 bytes). Ghost is 2 bytes wide. 16 - 2 = 14.
+
+//-----------------------------------------------------------------------------
+// Global Constants (Ghost Bitmap)
+// Stored in code memory to save RAM
+//-----------------------------------------------------------------------------
+uint8_t code ghost_L[GHOST_HEIGHT] = {
+    0x01, 0x03, 0x07, 0x07, 0xE5, 0x75, 0x35, 0x3F,
+    0x1E, 0x1E, 0x0F, 0x0F, 0x07, 0x03, 0x01, 0x00
+};
+
+uint8_t code ghost_R[GHOST_HEIGHT] = {
+    0xC0, 0xE0, 0xF0, 0xF0, 0x77, 0x7E, 0x7C, 0xFC,
+    0xF8, 0xF0, 0xF0, 0xF7, 0xFE, 0xFE, 0xFC, 0x70
+};
+
+//-----------------------------------------------------------------------------
+// Helper Function: Draw Ghost at specific column
+//-----------------------------------------------------------------------------
+void DrawGhost(uint8_t col_index, uint8_t *line_buf)
+{
+    uint8_t row;
+
+    // Clear screen first to ensure only one ghost exists
+    DISP_ClearAll();
+
+    for (row = 0; row < GHOST_HEIGHT; row++)
+    {
+        // 1. Clean the line buffer (set all pixels to 0)
+        memset(line_buf, 0, DISP_BUF_SIZE);
+
+        // 2. Place the ghost parts at the correct column offset
+        // We ensure we don't write out of bounds
+        if (col_index < DISP_BUF_SIZE - 1)
+        {
+            line_buf[col_index]     = ghost_L[row]; // Left part
+            line_buf[col_index + 1] = ghost_R[row]; // Right part
+        }
+
+        // 3. Send the line to the display
+        DISP_WriteLine(row, line_buf);
+    }
+}
+
+//-----------------------------------------------------------------------------
+// Main Routine
+//-----------------------------------------------------------------------------
+int main(void)
+{
+    // Define variable "line" to support text and graphics
+    SI_SEGMENT_VARIABLE(line[DISP_BUF_SIZE], uint8_t, RENDER_LINE_SEG);
+
+    // Variable to track horizontal position (Start roughly in middle, index 7)
+    int8_t current_col = 7;
+
+    // Flags to prevent continuous movement on long press (Debounce/Single Step)
+    uint8_t btn0_prev = 0;
+    uint8_t btn1_prev = 0;
+
+    enter_DefaultMode_from_RESET();  // Enter default mode
+    IE_EA = 1;  // Enable all interrupts
+
+    // Init LCD
+    DISP_Init();
+
+    // Initial Draw
+    DrawGhost(current_col, line);
+
+    while(1)
+    {
+        // ---------------- Handle Button 0 (Move Right) ----------------
+        if (BSP_PB0 == BSP_PB_PRESSED)
+        {
+            // Wait loop to create delay/debouncing or ensure single step
+            // Simple approach: Check if it was not pressed before (Edge detection)
+             TMR3_Delay(50); // Small debounce delay (50ms)
+
+             if (current_col < MAX_COL) // Boundary check
+             {
+                 current_col++;
+                 DrawGhost(current_col, line);
+
+                 // Wait for release to prevent flying across screen
+                 // (Optional: remove this while loop if you want continuous movement)
+                 while(BSP_PB0 == BSP_PB_PRESSED);
+             }
+        }
+
+        // ---------------- Handle Button 1 (Move Left) ----------------
+        if (BSP_PB1 == BSP_PB_PRESSED)
+        {
+             TMR3_Delay(50); // Small debounce delay
+
+             if (current_col > 0) // Boundary check
+             {
+                 current_col--;
+                 DrawGhost(current_col, line);
+
+                 // Wait for release
+                 while(BSP_PB1 == BSP_PB_PRESSED);
+             }
+        }
+    }
+}
