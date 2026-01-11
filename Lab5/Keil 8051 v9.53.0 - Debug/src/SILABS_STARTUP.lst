@@ -1,4 +1,4 @@
-AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        01/02/26 11:27:44 PAGE     1
+AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        01/02/26 11:31:43 PAGE     1
 
 
 MACRO ASSEMBLER AX51 V3.15.3.0
@@ -62,7 +62,7 @@ LOC    OBJ             LINE     SOURCE
  0000                    38     XDATALEN        EQU     0      
                          39     ;
                          40     ; <o> PDATASTART: PDATA memory start address <0x0-0xFFFF> 
-AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        01/02/26 11:27:44 PAGE     2
+AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        01/02/26 11:31:43 PAGE     2
 
                          41     ;     <i> The absolute start address of PDATA memory
  0000                    42     PDATASTART      EQU     0H
@@ -127,7 +127,7 @@ LOC    OBJ             LINE     SOURCE
  00A0                   101     PPAGE_SFR       DATA    0A0H
                         102     ;
                         103     ; </e>
-AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        01/02/26 11:27:44 PAGE     3
+AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        01/02/26 11:31:43 PAGE     3
 
                         104     ;------------------------------------------------------------------------------
                         105     
@@ -192,7 +192,7 @@ LOC    OBJ             LINE     SOURCE
                                                 MOV     R0,#LOW (PDATASTART)
                                                 MOV     R7,#LOW (PDATALEN)
                                                 CLR     A
-AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        01/02/26 11:27:44 PAGE     4
+AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        01/02/26 11:31:43 PAGE     4
 
                                 PDATALOOP:      MOVX    @R0,A
                                                 INC     R0
@@ -232,7 +232,7 @@ LOC    OBJ             LINE     SOURCE
 00000C 020000     E     201                     LJMP    ?C_START
                         202     
                         203                     END
-AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        01/02/26 11:27:44 PAGE     5
+AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        01/02/26 11:31:43 PAGE     5
 
 SYMBOL TABLE LISTING
 ------ ----- -------

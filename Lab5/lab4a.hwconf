@@ -14,24 +14,26 @@
     <property object="CLOCK_0" propertyId="clock.clockselect.selectsystemclocksource" value="High-Frequency Oscillator"/>
     <property object="CLOCK_0" propertyId="clock.clockselect.sysclk" value="48.000 MHz"/>
     <property object="CLOCK_0" propertyId="clock.clockselect.usbclk" value="48.000 MHz"/>
-    <property object="CROSSBAR0" propertyId="xbar0.pca0.cex" value="CEX0"/>
+    <property object="CROSSBAR0" propertyId="xbar0.spi0.clockdata" value="Enabled"/>
     <property object="DefaultMode" propertyId="mode.diagramLocation" value="100, 100"/>
     <property object="HFOSC_0" propertyId="ABPeripheral.included" value="true"/>
     <property object="HFOSC_0" propertyId="hfosc.highfrequencyoscillatorcontrol.hfoscdividedfrequency" value="24.000 MHz"/>
     <property object="HFOSC_0" propertyId="hfosc.highfrequencyoscillatorcontrol.hfoscundividedfrequency" value="48.000 MHz"/>
     <property object="HFOSC_0" propertyId="hfosc.highfrequencyoscillatorcontrol.oscillatorfrequencydividercontrol" value="Divide by 2"/>
+    <property object="INTERRUPT_0" propertyId="ABPeripheral.included" value="true"/>
     <property object="INTERRUPT_0" propertyId="interrupt.extendedinterruptenable1.enabletimer3interrupt" value="Enabled"/>
     <property object="INTERRUPT_0" propertyId="interrupt.interruptenable.enablespi0interrupt" value="Enabled"/>
     <property object="INTERRUPT_0" propertyId="interrupt.interruptenable.enabletimer2interrupt" value="Enabled"/>
     <property object="P0.0" propertyId="ports.settings.skip" value="Skipped"/>
     <property object="P0.1" propertyId="ports.settings.iomode" value="Digital Push-Pull Output"/>
     <property object="P0.1" propertyId="ports.settings.outputmode" value="Push-pull"/>
+    <property object="P0.1" propertyId="ports.settings.skip" value="Skipped"/>
     <property object="P0.2" propertyId="ports.settings.skip" value="Skipped"/>
     <property object="P0.3" propertyId="ports.settings.skip" value="Skipped"/>
-    <property object="P0.4" propertyId="ports.settings.iomode" value="Digital Push-Pull Output"/>
-    <property object="P0.4" propertyId="ports.settings.outputmode" value="Push-pull"/>
-    <property object="P0.5" propertyId="ports.settings.iomode" value="Digital Push-Pull Output"/>
-    <property object="P0.5" propertyId="ports.settings.outputmode" value="Push-pull"/>
+    <property object="P0.4" propertyId="ports.settings.skip" value="Skipped"/>
+    <property object="P0.5" propertyId="ports.settings.skip" value="Skipped"/>
+    <property object="P0.6" propertyId="ports.settings.iomode" value="Digital Push-Pull Output"/>
+    <property object="P0.6" propertyId="ports.settings.outputmode" value="Push-pull"/>
     <property object="P1.0" propertyId="ports.settings.iomode" value="Digital Push-Pull Output"/>
     <property object="P1.0" propertyId="ports.settings.outputmode" value="Push-pull"/>
     <property object="P1.1" propertyId="ports.settings.skip" value="Skipped"/>
@@ -49,9 +51,10 @@
     <property object="PBCFG_0" propertyId="pbcfg.settings.enablecrossbar" value="Enabled"/>
     <property object="PCACH_0" propertyId="ABPeripheral.included" value="true"/>
     <property object="PCACH_0" propertyId="pcach.pcachannel.dutycycle" value="100.00%"/>
-    <property object="PCACH_0" propertyId="pcach.pcachannel.outputfrequency" value="61.035 Hz"/>
-    <property object="PCACH_0" propertyId="pcach.pcachannelcapturecomparemode.enablechannel16bitpulsewidthmodulation" value="Enabled"/>
-    <property object="PCACH_0" propertyId="pcach.pcacontrol.channelcapturecomparemode" value="16-Bit Pulse Width Modulator"/>
+    <property object="PCACH_0" propertyId="pcach.pcachannel.outputfrequency" value="15.625 kHz"/>
+    <property object="PCACH_0" propertyId="pcach.pcachannelcapturecomparemode.enablechannelcomparatorfunction" value="Enabled"/>
+    <property object="PCACH_0" propertyId="pcach.pcachannelcapturecomparemode.enablechannelpulsewidthmodulationmoden" value="Enabled"/>
+    <property object="PCACH_0" propertyId="pcach.pcacontrol.channelcapturecomparemode" value="8-Bit Pulse Width Modulator"/>
     <property object="PCACH_1" propertyId="ABPeripheral.included" value="true"/>
     <property object="PCACH_1" propertyId="pcach.pcachannel.dutycycle" value="100.00%"/>
     <property object="PCACH_1" propertyId="pcach.pcachannel.outputfrequency" value="15.625 kHz"/>

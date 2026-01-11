@@ -40,6 +40,7 @@ enter_DefaultMode_from_RESET (void)
   TIMER01_0_enter_DefaultMode_from_RESET ();
   TIMER16_3_enter_DefaultMode_from_RESET ();
   SPI_0_enter_DefaultMode_from_RESET ();
+  INTERRUPT_0_enter_DefaultMode_from_RESET ();
   // Restore the SFRPAGE
   SFRPAGE = SFRPAGE_save;
   // [Config Calls]$
@@ -98,16 +99,15 @@ PCACH_0_enter_DefaultMode_from_RESET (void)
    - Disable negative edge capture
    - Disable CCF0 interrupts
    - Disable match function
-   - 16-bit PWM selected
+   - 8-bit PWM selected
    - Disable positive edge capture
-   - Disable comparator function
-   - Disable PWM function
+   - Enable comparator function
+   - Enable PWM function
    - Disable toggle function
    ***********************************************************************/
   PCA0CPM0 = PCA0CPM0_CAPN__DISABLED | PCA0CPM0_ECCF__DISABLED
-      | PCA0CPM0_MAT__DISABLED | PCA0CPM0_PWM16__16_BIT
-      | PCA0CPM0_CAPP__DISABLED | PCA0CPM0_ECOM__DISABLED
-      | PCA0CPM0_PWM__DISABLED | PCA0CPM0_TOG__DISABLED;
+      | PCA0CPM0_MAT__DISABLED | PCA0CPM0_PWM16__8_BIT | PCA0CPM0_CAPP__DISABLED
+      | PCA0CPM0_ECOM__ENABLED | PCA0CPM0_PWM__ENABLED | PCA0CPM0_TOG__DISABLED;
   // [PCA0CPM0 - PCA Channel 0 Capture/Compare Mode]$
 
   // $[PCA0CPL0 - PCA Channel 0 Capture Module Low Byte]
@@ -211,14 +211,14 @@ PORTS_0_enter_DefaultMode_from_RESET (void)
    - P0.1 output is push-pull
    - P0.2 output is open-drain
    - P0.3 output is open-drain
-   - P0.4 output is push-pull
-   - P0.5 output is push-pull
-   - P0.6 output is open-drain
+   - P0.4 output is open-drain
+   - P0.5 output is open-drain
+   - P0.6 output is push-pull
    - P0.7 output is open-drain
    ***********************************************************************/
   P0MDOUT = P0MDOUT_B0__OPEN_DRAIN | P0MDOUT_B1__PUSH_PULL
-      | P0MDOUT_B2__OPEN_DRAIN | P0MDOUT_B3__OPEN_DRAIN | P0MDOUT_B4__PUSH_PULL
-      | P0MDOUT_B5__PUSH_PULL | P0MDOUT_B6__OPEN_DRAIN | P0MDOUT_B7__OPEN_DRAIN;
+      | P0MDOUT_B2__OPEN_DRAIN | P0MDOUT_B3__OPEN_DRAIN | P0MDOUT_B4__OPEN_DRAIN
+      | P0MDOUT_B5__OPEN_DRAIN | P0MDOUT_B6__PUSH_PULL | P0MDOUT_B7__OPEN_DRAIN;
   // [P0MDOUT - Port 0 Output Mode]$
 
   // $[P0MDIN - Port 0 Input Mode]
@@ -227,16 +227,16 @@ PORTS_0_enter_DefaultMode_from_RESET (void)
   // $[P0SKIP - Port 0 Skip]
   /***********************************************************************
    - P0.0 pin is skipped by the crossbar
-   - P0.1 pin is not skipped by the crossbar
+   - P0.1 pin is skipped by the crossbar
    - P0.2 pin is skipped by the crossbar
    - P0.3 pin is skipped by the crossbar
-   - P0.4 pin is not skipped by the crossbar
-   - P0.5 pin is not skipped by the crossbar
+   - P0.4 pin is skipped by the crossbar
+   - P0.5 pin is skipped by the crossbar
    - P0.6 pin is not skipped by the crossbar
    - P0.7 pin is not skipped by the crossbar
    ***********************************************************************/
-  P0SKIP = P0SKIP_B0__SKIPPED | P0SKIP_B1__NOT_SKIPPED | P0SKIP_B2__SKIPPED
-      | P0SKIP_B3__SKIPPED | P0SKIP_B4__NOT_SKIPPED | P0SKIP_B5__NOT_SKIPPED
+  P0SKIP = P0SKIP_B0__SKIPPED | P0SKIP_B1__SKIPPED | P0SKIP_B2__SKIPPED
+      | P0SKIP_B3__SKIPPED | P0SKIP_B4__SKIPPED | P0SKIP_B5__SKIPPED
       | P0SKIP_B6__NOT_SKIPPED | P0SKIP_B7__NOT_SKIPPED;
   // [P0SKIP - Port 0 Skip]$
 
@@ -358,17 +358,30 @@ PBCFG_0_enter_DefaultMode_from_RESET (void)
   /***********************************************************************
    - Weak Pullups enabled 
    - Crossbar enabled
-   - CEX0 routed to Port pin
+   - All PCA I/O unavailable at Port pins
    - ECI unavailable at Port pin
    - T0 unavailable at Port pin
    - T1 unavailable at Port pin
    ***********************************************************************/
   XBR1 = XBR1_WEAKPUD__PULL_UPS_ENABLED | XBR1_XBARE__ENABLED
-      | XBR1_PCA0ME__CEX0 | XBR1_ECIE__DISABLED | XBR1_T0E__DISABLED
+      | XBR1_PCA0ME__DISABLED | XBR1_ECIE__DISABLED | XBR1_T0E__DISABLED
       | XBR1_T1E__DISABLED;
   // [XBR1 - Port I/O Crossbar 1]$
 
   // $[XBR0 - Port I/O Crossbar 0]
+  /***********************************************************************
+   - UART0 I/O unavailable at Port pin
+   - SPI I/O routed to Port pins
+   - SMBus 0 I/O unavailable at Port pins
+   - CP0 unavailable at Port pin
+   - Asynchronous CP0 unavailable at Port pin
+   - CP1 unavailable at Port pin
+   - Asynchronous CP1 unavailable at Port pin
+   - SYSCLK unavailable at Port pin
+   ***********************************************************************/
+  XBR0 = XBR0_URT0E__DISABLED | XBR0_SPI0E__ENABLED | XBR0_SMB0E__DISABLED
+      | XBR0_CP0E__DISABLED | XBR0_CP0AE__DISABLED | XBR0_CP1E__DISABLED
+      | XBR0_CP1AE__DISABLED | XBR0_SYSCKE__DISABLED;
   // [XBR0 - Port I/O Crossbar 0]$
 
   // $[XBR2 - Port I/O Crossbar 2]
@@ -677,7 +690,6 @@ TIMER01_0_enter_DefaultMode_from_RESET (void)
 extern void
 ADC_0_enter_DefaultMode_from_RESET (void)
 {
-
   // $[ADC0CF - ADC0 Configuration]
   /***********************************************************************
    - Data in the ADC0H:ADC0L registers is right-justified
@@ -726,7 +738,6 @@ ADC_0_enter_DefaultMode_from_RESET (void)
 extern void
 VREF_0_enter_DefaultMode_from_RESET (void)
 {
-
   // $[REF0CN - Voltage Reference Control]
   /***********************************************************************
    - Disable the internal Temperature Sensor

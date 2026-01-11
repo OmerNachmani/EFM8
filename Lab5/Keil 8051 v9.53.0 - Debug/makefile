@@ -30,7 +30,7 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := Lab5
+BUILD_ARTIFACT_NAME := Lab5_c_2_3
 BUILD_ARTIFACT_EXTENSION := omf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
@@ -41,24 +41,24 @@ BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ART
 all: main-build
 
 # Main-build Target
-main-build: Lab5.omf
+main-build: Lab5_c_2_3.omf
 
 # Tool invocations
-Lab5.omf: echo_path $(OBJS) $(USER_OBJS) makefile objects.mk $(OPTIONAL_TOOL_DEPS)
+Lab5_c_2_3.omf: echo_path $(OBJS) $(USER_OBJS) makefile objects.mk $(OPTIONAL_TOOL_DEPS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Keil 8051 Linker'
-	wine "/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN/LX51" "@Lab5.lnp" || $(RC)
+	wine "/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN/LX51" "@Lab5_c_2_3.lnp" || $(RC)
 	@echo 'Finished building target: $@'
 
 # Change from all upper case to the expected case
-	@-mv "LAB5.OMF.CRBUILD" "$@"
+	@-mv "LAB5_C_2_3.OMF.CRBUILD" "$@"
 
-# Generate hex file: Lab5.hex
-	@wine "/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN/Ohx51" "Lab5.omf" "HEXFILE (Lab5.hex)" "H386" 2>&1 >/dev/null
+# Generate hex file: Lab5_c_2_3.hex
+	@wine "/home/onachman/SimplicityStudio5/SimplicityStudio_v5/developer/toolchains/keil_8051/9.60/BIN/Ohx51" "Lab5_c_2_3.omf" "HEXFILE (Lab5_c_2_3.hex)" "H386" 2>&1 >/dev/null
 
 # Other Targets
 clean:
-	-$(RM) $(EXECUTABLES)$(OBJS) Lab5.omf
+	-$(RM) $(EXECUTABLES)$(OBJS) Lab5_c_2_3.omf
 	-@echo ' '
 
 .PHONY: all clean dependents main-build

@@ -1,0 +1,13 @@
+# Backup archives
+*.zip
+
+# Simplicity Studio IDE files
+.metadata/
+.browser/
+outgoing/
+
+# Build outputs
+*/Keil 8051 v9.53.0 - Debug/
+
+# Project exports (keep projects as folders)
+*.sls
